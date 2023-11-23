@@ -2,16 +2,15 @@ package com.audiostore.demo.service;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.dao.DataIntegrityViolationException;
-
 import org.springframework.stereotype.Service;
 
 import com.audiostore.demo.domain.dto.UserDto;
 import com.audiostore.demo.domain.models.User;
 import com.audiostore.demo.repository.UserRepository;
 
+import java.security.Principal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -38,7 +37,11 @@ public class UserService {
 
     public User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Invalid user id" + id));
+                new IllegalArgumentException("Invalid user id " + id));
+    }
+
+    public List<User> getAll(){
+        return userRepository.findAll();
     }
 
     public User getUserByEmail(String email) {

@@ -1,10 +1,16 @@
 package com.audiostore.demo.api.controllers;
 
 import org.springframework.http.HttpStatus;
+
+import java.security.Principal;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,5 +53,21 @@ public class UserControler {
         System.out.println("logged in new user: " + user.getFirstName() + " " + user.getLastName());
         // securityService.login(user.getEmail(), user.getPassword());
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getUserDetails(@PathVariable long userId, Principal auth) {
+        return new ResponseEntity<>(UserDto.convert(userService.getUserById(userId)), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping("all")
+    public ResponseEntity<?> getAllUsers() {
+        return new ResponseEntity<>(userService.getAll(), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable long userId) {
+        userService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
