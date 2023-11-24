@@ -28,7 +28,6 @@ public class UploadController {
         response.setBufferSize(2048 * 20);
         try {
             File file = new File(UPLOAD_DIR + fileType + "/" + filePath);
-
             //mimetype
             String mimeType = Files.probeContentType(file.toPath());
             response.setContentType(mimeType);

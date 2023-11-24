@@ -1,21 +1,21 @@
 package com.audiostore.demo.api.controllers;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.audiostore.demo.domain.dto.AuthorDto;
 import com.audiostore.demo.domain.dto.SongDto;
 import com.audiostore.demo.service.SongService;
 
@@ -37,6 +37,11 @@ public class SongController {
         return new ResponseEntity<>(SongDto.convert(songService.getSong(songId)), new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping("all")
+    public ResponseEntity<?> getAuthor() {
+        return new ResponseEntity<>(songService.getAll(), new HttpHeaders(), HttpStatus.OK);
+    }
+
     @PostMapping("new")
     public ResponseEntity<?> newSong(   @RequestParam("name") String name, 
                                         @RequestParam("author_id") long author_id,
@@ -46,4 +51,21 @@ public class SongController {
         
         return new ResponseEntity<>(SongDto.convert(songService.createSong(name, author_id, picture, audio)), new HttpHeaders(), HttpStatus.OK);
     }
+
+    @PutMapping("{songId}")
+    public ResponseEntity<?> updateSong(HttpServletRequest request, HttpServletResponse response, 
+                                        @PathVariable long songId,
+                                        @RequestParam("name") String name, 
+                                        @RequestParam("author_id") long author_id,
+                                        @RequestParam("picture") MultipartFile picture,
+                                        @RequestParam("audio") MultipartFile audio
+                                        ) throws IOException{
+        return new ResponseEntity<>(SongDto.convert(songService.updateSong(songId, name, author_id, picture, audio)), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{songId}")
+    public ResponseEntity<?> getSong(@PathVariable long songId){
+        songService.deleteSong(songId);
+        return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
+    }    
 }

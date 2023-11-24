@@ -1,5 +1,6 @@
 package com.audiostore.demo.utils;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -15,6 +16,13 @@ public class FileUploadUtil {
         try{
             String fileName = file.getOriginalFilename();
             Path filePath = Path.of(directory + fileName);
+
+            // File existingFile = new File(directory + fileName);
+            // if(!existingFile.exists()){
+            //     System.out.println("file not exists. Creating new file...");
+            // }
+            
+
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         }
         catch(Exception e){
