@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.audiostore.demo.domain.dto.AuthorDto;
 import com.audiostore.demo.service.AuthorService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AuthorController {
 
     @GetMapping("{author_id}")
     public ResponseEntity<?> getAuthor(@PathVariable long author_id) {
-        return new ResponseEntity<>(authorService.getAuthor(author_id), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(AuthorDto.convert(authorService.getAuthor(author_id)), new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("new")

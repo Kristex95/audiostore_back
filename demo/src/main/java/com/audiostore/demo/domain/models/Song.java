@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "Song",  uniqueConstraints={ @UniqueConstraint(columnNames={"name", "author_id"}),})
 public class Song {

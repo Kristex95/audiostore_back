@@ -9,9 +9,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.audiostore.demo.domain.dto.AuthorDto;
 import com.audiostore.demo.domain.models.Author;
 import com.audiostore.demo.repository.AuthorRepository;
+import com.audiostore.demo.utils.FileUploadUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,23 +27,15 @@ public class AuthorService {
         return authorRepository.findAll();
     }
     
-    public AuthorDto getAuthor(long authorId) {
+    public Author getAuthor(long authorId) {
         Author author = authorRepository.findById(authorId).orElseThrow();
-        return AuthorDto.convert(author);
+        return author;
     }
 
     public Author createAuthor(String name, MultipartFile picture) throws IOException{
-        if (picture.isEmpty()) {
-            System.out.println("no file");
-        }
-        try{
-            String fileName = picture.getOriginalFilename();
-            Path filePath = Path.of(UPLOAD_DIR + fileName);
-            Files.copy(picture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        }
-        catch(Exception e){
-            System.out.println(e);
-        }
+        
+        FileUploadUtil.saveFile(picture, UPLOAD_DIR);
+
         Author author = Author.builder().name(name).picture_path(IMAGES_PATH + picture.getOriginalFilename()).build();
         return authorRepository.save(author);
     }

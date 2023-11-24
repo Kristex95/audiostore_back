@@ -5,11 +5,10 @@ import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.audiostore.demo.domain.dto.SongDto;
 import com.audiostore.demo.domain.models.Author;
 import com.audiostore.demo.domain.models.Song;
-import com.audiostore.demo.repository.AuthorRepository;
 import com.audiostore.demo.repository.SongRepository;
+import com.audiostore.demo.utils.FileUploadUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,25 +19,47 @@ public class SongService {
     private final String AUDIO_PATH = "audio/";
     private final String PICTURE_PATH = "picture/";
 
-    private final SongRepository songRepository;
-    private final AuthorRepository authorRepository;
+    private static final String IMAGE_UPLOAD_DIR = "demo/public/images/";
+    private static final String AUDIO_UPLOAD_DIR = "demo/public/audio/";
 
-    public SongDto getSong(long id){
+    private final SongRepository songRepository;
+    private final AuthorService authorService;
+
+    public Song getSong(long id){
         Song song = songRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Invalid song id " + id));
-        return SongDto.convert(song);
+        return song;
     }
 
-    public SongDto createSong(String name, long author_id, MultipartFile picture, MultipartFile audio) throws IOException{
-        Author author = authorRepository.findById(author_id).orElseThrow(() ->
-                new IllegalArgumentException("Invalid author id " + author_id));
+    public Song createSong(String name, long author_id, MultipartFile picture, MultipartFile audio) throws IOException{
+        
+        Author author = authorService.getAuthor(author_id);
+
+        FileUploadUtil.saveFile(picture, IMAGE_UPLOAD_DIR);
+        FileUploadUtil.saveFile(audio, AUDIO_UPLOAD_DIR);
+
         Song song = Song.builder()
               .name(name)
               .author(author)
               .picture_path(PICTURE_PATH + picture.getOriginalFilename())
               .audio_path(AUDIO_PATH + audio.getOriginalFilename())
               .build();
-        songRepository.save(song);
-        return SongDto.convert(song);
+        return songRepository.save(song);
+    }
+
+    public Song updateSong(long id, String name, long author_id, MultipartFile picture, MultipartFile audio){
+
+        Author author = authorService.getAuthor(author_id);
+
+        FileUploadUtil.saveFile(picture, IMAGE_UPLOAD_DIR);
+        FileUploadUtil.saveFile(audio, AUDIO_UPLOAD_DIR);
+
+        Song song = getSong(id);
+        song.setName(name);
+        song.setPicture_path(PICTURE_PATH + picture.getOriginalFilename());
+        song.setAudio_path(AUDIO_PATH + audio.getOriginalFilename());
+        song.setAuthor(author);
+        
+        return songRepository.save(song);
     }
 }

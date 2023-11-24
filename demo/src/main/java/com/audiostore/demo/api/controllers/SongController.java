@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.audiostore.demo.domain.dto.SongDto;
 import com.audiostore.demo.service.SongService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,13 +29,12 @@ import lombok.RequiredArgsConstructor;
 public class SongController {
 
     private final SongService songService;
-    private static final String IMAGE_UPLOAD_DIR = "demo/public/images/";
-    private static final String AUDIO_UPLOAD_DIR = "demo/public/audio/";
+
 
 
     @GetMapping("{songId}")
     public ResponseEntity<?> getSong(HttpServletRequest request, HttpServletResponse response, @PathVariable long songId) throws IOException{
-        return new ResponseEntity<>(songService.getSong(songId), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(SongDto.convert(songService.getSong(songId)), new HttpHeaders(), HttpStatus.OK);
     }
 
     @PostMapping("new")
@@ -43,35 +43,7 @@ public class SongController {
                                         @RequestParam("picture") MultipartFile picture,
                                         @RequestParam("audio") MultipartFile audio) 
                                         throws IOException{
-
-        //image
-        if (picture.isEmpty()) {
-            System.out.println("no file");
-        }
-        try{
-            String fileName = picture.getOriginalFilename();
-            Path filePath = Path.of(IMAGE_UPLOAD_DIR + fileName);
-            Files.copy(picture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        }
-        catch(Exception e){
-            System.out.println(e);
-        }    
         
-
-        //audio
-        if (audio.isEmpty()) {
-            System.out.println("no file");
-        }
-        try{
-            String fileName = audio.getOriginalFilename();
-            Path filePath = Path.of(AUDIO_UPLOAD_DIR + fileName);
-            Files.copy(audio.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        }
-        catch(Exception e){
-            System.out.println(e);
-        }
-        
-        songService.createSong(name, author_id, picture, audio);
-        return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(SongDto.convert(songService.createSong(name, author_id, picture, audio)), new HttpHeaders(), HttpStatus.OK);
     }
 }
