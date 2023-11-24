@@ -2,8 +2,6 @@ package com.audiostore.demo.domain.models;
 
 import java.util.List;
 
-import org.hibernate.engine.jdbc.env.internal.LobTypes;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,10 +26,9 @@ public class Author {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "picture")
-    private byte[] picture;
+    @Column(name = "picture_path")
+    private String picture_path;
 
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Song> songs;   
 }

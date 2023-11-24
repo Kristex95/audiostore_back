@@ -3,7 +3,6 @@ package com.audiostore.demo.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.audiostore.demo.domain.models.Role;
 import com.audiostore.demo.domain.models.User;
 import com.audiostore.demo.repository.UserRepository;
 

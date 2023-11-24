@@ -8,13 +8,9 @@ import com.audiostore.demo.domain.dto.UserDto;
 import com.audiostore.demo.domain.models.User;
 import com.audiostore.demo.repository.UserRepository;
 
-import java.security.Principal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("api/author/")
 @RequiredArgsConstructor
 public class AuthorController {
+
     private final AuthorService authorService;
 
     @GetMapping("{author_id}")
@@ -29,8 +31,17 @@ public class AuthorController {
     }
 
     @PostMapping("new")
-    public ResponseEntity<?> newAuthor(@RequestParam("picture") MultipartFile picture, @RequestParam("name") String name) throws IOException{
-        authorService.createAuthor(name, picture);
+    public ResponseEntity<?> newAuthor( @RequestParam("picture") MultipartFile picture, 
+                                        @RequestParam("name") String name) 
+                                        throws IOException{
+
+        
+        return new ResponseEntity<>(authorService.createAuthor(name, picture), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{author_id}")
+    private ResponseEntity<?> deleteAuthor(@PathVariable long author_id) throws IOException{
+        authorService.delete(author_id);
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
     }
 }
