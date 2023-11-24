@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.audiostore.demo.domain.dto.AuthorDto;
 import com.audiostore.demo.domain.models.Author;
 import com.audiostore.demo.repository.AuthorRepository;
 import com.audiostore.demo.utils.FileUploadUtil;
@@ -21,8 +20,8 @@ public class AuthorService {
     private static final String UPLOAD_DIR = "demo/public/images/";
     private final AuthorRepository authorRepository;
     
-    public List<AuthorDto> getAll(){
-        return authorRepository.findAll().stream().map(author->AuthorDto.convert(author)).toList();
+    public List<Author> getAll(){
+        return authorRepository.findAll();
     }
     
     public Author getAuthor(long authorId) {
@@ -44,7 +43,7 @@ public class AuthorService {
         FileUploadUtil.saveFile(picture, UPLOAD_DIR);
 
         author.setName(name);
-        author.setPicture_path(picture.getOriginalFilename());
+        author.setPicture_path(IMAGES_PATH + picture.getOriginalFilename());
         return authorRepository.save(author);
     }
 

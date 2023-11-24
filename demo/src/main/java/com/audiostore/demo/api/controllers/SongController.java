@@ -7,15 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.audiostore.demo.domain.dto.AuthorDto;
 import com.audiostore.demo.domain.dto.SongDto;
 import com.audiostore.demo.service.SongService;
 
@@ -52,7 +51,7 @@ public class SongController {
         return new ResponseEntity<>(SongDto.convert(songService.createSong(name, author_id, picture, audio)), new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PutMapping("{songId}")
+    @PatchMapping("{songId}")
     public ResponseEntity<?> updateSong(HttpServletRequest request, HttpServletResponse response, 
                                         @PathVariable long songId,
                                         @RequestParam("name") String name, 

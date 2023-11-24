@@ -38,7 +38,5 @@ public class UploadController {
         } catch (IOException e) {
             // Do something
         }
-    }
-
-    
+    }    
 }

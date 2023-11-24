@@ -38,12 +38,19 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
         name = " user_song", 
         joinColumns = { @JoinColumn(name="user_id") }, 
         inverseJoinColumns = { @JoinColumn(name = "song_id") }
     )
     List<Song> songs = new ArrayList<>();
+
+    public void addSong(Song song) {
+        if (songs == null) {
+            songs = new ArrayList<>();
+        }
+        songs.add(song);
+    }
 
 }

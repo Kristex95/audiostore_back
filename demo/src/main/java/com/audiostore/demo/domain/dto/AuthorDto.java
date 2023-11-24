@@ -22,4 +22,7 @@ public class AuthorDto {
         return new AuthorDto(author.getId(), author.getName(), author.getPicture_path(), author.getSongs().stream().map(song->SongDto.convert(song)).toList());
     }
 
+    public static List<AuthorDto> convert(List<Author> authors) {
+        return authors.stream().map(author->AuthorDto.convert(author)).toList();
+    }
 }

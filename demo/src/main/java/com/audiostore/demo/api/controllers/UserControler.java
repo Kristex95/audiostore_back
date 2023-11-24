@@ -10,8 +10,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.audiostore.demo.domain.dto.LoginDto;
 import com.audiostore.demo.domain.dto.UserDto;
 import com.audiostore.demo.service.SecurityService;
+import com.audiostore.demo.service.UserPermissionService;
 import com.audiostore.demo.service.UserService;
 
 import jakarta.validation.Valid;
@@ -30,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class UserControler {
     private final UserService userService;
     private final SecurityService securityService;
+    private final UserPermissionService permissionService;
 
     @PostMapping("login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDto dto, BindingResult bindingResult) {
@@ -57,17 +61,37 @@ public class UserControler {
 
     @GetMapping("{userId}")
     public ResponseEntity<?> getUserDetails(@PathVariable long userId, Principal auth) {
-        return new ResponseEntity<>(UserDto.convert(userService.getUserById(userId)), new HttpHeaders(), HttpStatus.OK);
+        if(permissionService.isAuthenticated(userId, auth.getName()) || permissionService.isAdmin(auth.getName())) {
+            return new ResponseEntity<>(UserDto.convert(userService.getUserById(userId)), new HttpHeaders(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("all")
     public ResponseEntity<?> getAllUsers() {
-        return new ResponseEntity<>(userService.getAll(), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(UserDto.convert(userService.getAll()), new HttpHeaders(), HttpStatus.OK);
     }
 
     @DeleteMapping("{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable long userId) {
         userService.deleteUser(userId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable long userId,
+                                        @RequestBody UserDto userDto,
+                                        Principal auth){
+        if(permissionService.isAuthenticated(userId, auth.getName())){
+            return new ResponseEntity<>(UserDto.convert(userService.updateUser(userId, userDto)), new HttpHeaders(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @PutMapping("song/{songId}")
+    public ResponseEntity<?> saveSong(  @PathVariable("songId") long song_id,
+                                        Principal auth){
+        long user_id = userService.getUserByEmail(auth.getName()).getId();
+        return new ResponseEntity<>(UserDto.convert(userService.addSong(user_id, song_id)), new HttpHeaders(), HttpStatus.OK);
     }
 }
