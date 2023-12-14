@@ -7,6 +7,8 @@ import java.security.Principal;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +45,8 @@ public class UserControler {
         }
         try {
             securityService.login(dto.getLogin(), dto.getPassword());
-            return new ResponseEntity<>("Login success", HttpStatus.OK);
+            UserDto user = UserDto.convert(userService.getUserByEmail(dto.getLogin()));
+            return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>("Bad Creds", HttpStatus.BAD_REQUEST);
         }
@@ -60,10 +64,15 @@ public class UserControler {
     }
 
     @GetMapping("{userId}")
-    public ResponseEntity<?> getUserDetails(@PathVariable long userId, Principal auth) {
-        if(permissionService.isAuthenticated(userId, auth.getName()) || permissionService.isAdmin(auth.getName())) {
-            return new ResponseEntity<>(UserDto.convert(userService.getUserById(userId)), new HttpHeaders(), HttpStatus.OK);
-        }
+    public ResponseEntity<?> getUserDetails(@PathVariable long userId, Authentication authentication) {
+            // Extracting the username from Basic Authentication
+            String username =  authentication.getName();
+
+            if (permissionService.isAuthenticated(userId, username) || permissionService.isAdmin(username)) {
+                return new ResponseEntity<>(UserDto.convert(userService.getUserById(userId)), new HttpHeaders(),
+                        HttpStatus.OK);
+            }
+        
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
@@ -80,18 +89,19 @@ public class UserControler {
 
     @PatchMapping("{userId}")
     public ResponseEntity<?> updateUser(@PathVariable long userId,
-                                        @RequestBody UserDto userDto,
-                                        Principal auth){
-        if(permissionService.isAuthenticated(userId, auth.getName())){
-            return new ResponseEntity<>(UserDto.convert(userService.updateUser(userId, userDto)), new HttpHeaders(), HttpStatus.OK);
+            @RequestBody UserDto userDto,
+            Principal auth) {
+        if (permissionService.isAuthenticated(userId, auth.getName())) {
+            return new ResponseEntity<>(UserDto.convert(userService.updateUser(userId, userDto)), new HttpHeaders(),
+                    HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @PutMapping("song/{songId}")
-    public ResponseEntity<?> saveSong(  @PathVariable("songId") long song_id,
-                                        Principal auth){
+    public ResponseEntity<?> saveSong(@PathVariable("songId") long song_id, Principal auth) {
         long user_id = userService.getUserByEmail(auth.getName()).getId();
-        return new ResponseEntity<>(UserDto.convert(userService.addSong(user_id, song_id)), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(UserDto.convert(userService.addSong(user_id, song_id)), new HttpHeaders(),
+                HttpStatus.OK);
     }
 }

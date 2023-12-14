@@ -1,6 +1,7 @@
 package com.audiostore.demo.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -71,5 +72,17 @@ public class SongService {
     public void deleteSong(long id){
         Song song = getSong(id);
         songRepository.delete(song);
+    }
+
+    public List<Song> getMostPopularSongs() {
+        List<Object[]> result = songRepository.findMostPopularSongs();
+
+        List<Song> mostPopularSongs = new ArrayList<>();
+        for (Object[] row : result) {
+            Song song = (Song) row[0];
+            mostPopularSongs.add(song);
+        }
+
+        return mostPopularSongs;
     }
 }

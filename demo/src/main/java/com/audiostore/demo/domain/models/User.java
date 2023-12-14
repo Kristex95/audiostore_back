@@ -1,7 +1,9 @@
 package com.audiostore.demo.domain.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,11 +46,11 @@ public class User {
         joinColumns = { @JoinColumn(name="user_id") }, 
         inverseJoinColumns = { @JoinColumn(name = "song_id") }
     )
-    List<Song> songs = new ArrayList<>();
+    private Set<Song> songs = new HashSet<>();
 
     public void addSong(Song song) {
         if (songs == null) {
-            songs = new ArrayList<>();
+            songs = new HashSet<>();
         }
         songs.add(song);
     }

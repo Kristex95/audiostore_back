@@ -67,4 +67,9 @@ public class SongController {
         songService.deleteSong(songId);
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
     }    
+
+    @GetMapping("popular")
+    public ResponseEntity<?> getPopular(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        return new ResponseEntity<>(SongDto.convert(songService.getMostPopularSongs()), new HttpHeaders(), HttpStatus.OK);
+    }
 }
